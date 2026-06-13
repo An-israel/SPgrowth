@@ -5,7 +5,6 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { TOTAL_DAYS, isProgressComplete } from "@/lib/program";
 import { SignOutButton } from "@/components/sign-out-button";
-import { Logo } from "@/components/logo";
 import { Blobs } from "@/components/blobs";
 import { Users, TrendingUp, Award, Clock, Search } from "lucide-react";
 import { ResourcesManager } from "./resources-manager";
@@ -132,11 +131,8 @@ export function AdminClient({
       <Blobs />
       <header className="sticky top-0 z-30 border-b border-white/40 bg-white/60 backdrop-blur-lg">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-          <span className="inline-flex items-center gap-2.5">
-            <Logo withText={false} />
-            <span className="font-display text-lg font-extrabold tracking-tight text-ink">
-              IDLC <span className="text-gradient">Admin</span>
-            </span>
+          <span className="font-display text-lg font-extrabold tracking-tight text-ink">
+            IDLC <span className="text-gradient">Admin</span>
           </span>
           <div className="flex items-center gap-2">
             <Link
