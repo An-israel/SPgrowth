@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { AuthShell, Field, FormMessage } from "@/components/auth-ui";
+import { AuthShell, Field, FormMessage, SubmitButton } from "@/components/auth-ui";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -63,18 +63,14 @@ export default function SignUpPage() {
         {error && <FormMessage kind="error">{error}</FormMessage>}
         {info && <FormMessage kind="info">{info}</FormMessage>}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-xl bg-navy-800 px-6 py-3 font-semibold text-cream-50 transition hover:bg-navy-700 disabled:opacity-60"
-        >
-          {loading ? "Creating account…" : "Sign Up"}
-        </button>
+        <SubmitButton loading={loading} loadingText="Creating account…">
+          Sign Up
+        </SubmitButton>
       </form>
 
-      <p className="mt-6 text-center text-sm text-navy-700">
+      <p className="mt-6 text-center text-sm text-muted">
         Already have an account?{" "}
-        <Link href="/login" className="font-semibold text-gold-600 hover:underline">
+        <Link href="/login" className="font-semibold text-indigo-600 hover:underline">
           Sign In
         </Link>
       </p>

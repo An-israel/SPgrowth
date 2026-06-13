@@ -1,6 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import {
+  BookOpen,
+  PenLine,
+  HandHeart,
+  Check,
+  Flame,
+  ExternalLink,
+  Sparkles,
+  type LucideIcon,
+} from "lucide-react";
 import type { DailyContent } from "@/types/database";
 import type { LocalProgress } from "./dashboard-client";
 
@@ -26,7 +36,6 @@ export function DayCard({
   const [response, setResponse] = useState(progress.exercise_response ?? "");
   const lastDay = useRef(day.day_number);
 
-  // Reset the textarea when the selected day changes.
   useEffect(() => {
     if (lastDay.current !== day.day_number) {
       setResponse(progress.exercise_response ?? "");
@@ -35,35 +44,37 @@ export function DayCard({
   }, [day.day_number, progress.exercise_response]);
 
   return (
-    <article className="animate-fade-in rounded-3xl border border-cream-200 bg-white p-6 shadow-sm sm:p-8">
+    <article className="glass-strong animate-fade-in rounded-3xl p-6 sm:p-8">
       <header>
-        <p className="text-sm font-semibold uppercase tracking-wide text-gold-600">
+        <p className="text-sm font-bold uppercase tracking-wide text-gold-600">
           {WEEK_TITLES[day.week_number]}
         </p>
-        <div className="mt-1 flex items-baseline gap-3">
-          <span className="text-sm font-medium text-navy-700">
-            Day {day.day_number} · {day.chapter}
-          </span>
-        </div>
-        <h2 className="mt-2 font-serif text-3xl font-bold text-navy-900">
+        <p className="mt-1 text-sm font-semibold text-muted">
+          Day {day.day_number} · {day.chapter}
+        </p>
+        <h2 className="mt-2 font-display text-3xl font-extrabold leading-tight tracking-tight text-ink sm:text-4xl">
           {day.topic}
         </h2>
+        <div className="mt-3 h-1.5 w-16 rounded-full gradient-gold-indigo" />
       </header>
 
       {/* Key Truth */}
-      <div className="mt-5 rounded-2xl border-l-4 border-gold-500 bg-cream-100 p-4">
-        <p className="text-xs font-semibold uppercase tracking-wide text-gold-600">
-          Key Truth
-        </p>
-        <p className="mt-1 font-serif text-lg italic text-navy-900">
+      <div className="mt-6 rounded-2xl border border-gold-200 bg-gold-50/70 p-5">
+        <div className="flex items-center gap-2 text-gold-600">
+          <Sparkles className="h-4 w-4" />
+          <span className="text-xs font-bold uppercase tracking-wide">
+            Key Truth
+          </span>
+        </div>
+        <p className="mt-1.5 font-display text-lg font-bold text-ink">
           {day.key_truth}
         </p>
       </div>
 
       {/* Reading */}
-      <Section title="Reading" done={progress.reading_done}>
-        <p className="text-navy-700">
-          Read <span className="font-semibold">{day.chapter}</span> of{" "}
+      <Section icon={BookOpen} title="Reading" done={progress.reading_done}>
+        <p className="text-muted">
+          Read <span className="font-semibold text-ink">{day.chapter}</span> of{" "}
           <span className="italic">Growing Up, Spiritually</span>.
         </p>
         <TaskButton
@@ -74,9 +85,9 @@ export function DayCard({
       </Section>
 
       {/* Practical Exercise */}
-      <Section title="Practical Exercise" done={progress.exercise_done}>
-        <p className="text-navy-700">{day.practical_exercise}</p>
-        <div className="relative">
+      <Section icon={PenLine} title="Practical Exercise" done={progress.exercise_done}>
+        <p className="text-muted">{day.practical_exercise}</p>
+        <div>
           <textarea
             value={response}
             onChange={(e) => {
@@ -85,9 +96,9 @@ export function DayCard({
             }}
             rows={4}
             placeholder="Write your response here…"
-            className="w-full resize-y rounded-xl border border-cream-200 bg-cream-50 p-3 text-navy-900 outline-none transition focus:border-gold-400 focus:ring-2 focus:ring-gold-400/30"
+            className="w-full resize-y rounded-xl border border-gray-200 bg-white/80 p-3.5 text-ink outline-none transition placeholder:text-muted/60 focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20"
           />
-          <span className="mt-1 block text-right text-xs text-navy-700/60">
+          <span className="mt-1 block text-right text-xs text-muted/70">
             {responseSaving ? "Saving…" : "Saved automatically"}
           </span>
         </div>
@@ -99,8 +110,8 @@ export function DayCard({
       </Section>
 
       {/* Prayer Focus */}
-      <Section title="Prayer Focus" done={progress.prayer_done}>
-        <p className="text-navy-700">{day.prayer_focus}</p>
+      <Section icon={HandHeart} title="Prayer Focus" done={progress.prayer_done}>
+        <p className="text-muted">{day.prayer_focus}</p>
         <TaskButton
           done={progress.prayer_done}
           label="Mark Prayer Done"
@@ -110,11 +121,14 @@ export function DayCard({
 
       {/* Weekly Challenge (review days only) */}
       {day.is_review_day && day.weekly_challenge && (
-        <div className="mt-6 rounded-2xl border border-gold-400/40 bg-gradient-to-br from-gold-400/15 to-cream-100 p-5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-gold-600">
-            🔥 Weekly Challenge
-          </p>
-          <p className="mt-1 font-medium text-navy-900">
+        <div className="mt-6 overflow-hidden rounded-2xl gradient-gold-indigo p-5 text-white shadow-soft">
+          <div className="flex items-center gap-2">
+            <Flame className="h-5 w-5" />
+            <span className="text-xs font-bold uppercase tracking-wide">
+              Weekly Challenge
+            </span>
+          </div>
+          <p className="mt-2 text-lg font-bold leading-snug">
             {day.weekly_challenge}
           </p>
         </div>
@@ -123,49 +137,54 @@ export function DayCard({
       {/* Recommended Resources */}
       {day.resources && day.resources.length > 0 ? (
         <div className="mt-6">
-          <p className="text-sm font-semibold text-navy-900">
-            Recommended Resources
-          </p>
-          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+          <p className="text-sm font-bold text-ink">Recommended Resources</p>
+          <div className="mt-2.5 grid gap-2.5 sm:grid-cols-2">
             {day.resources.map((r, idx) => (
               <a
                 key={idx}
                 href={r.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-between gap-2 rounded-xl border border-cream-200 bg-cream-50 px-4 py-3 text-sm font-medium text-navy-800 transition hover:border-gold-400 hover:bg-cream-100"
+                className="glass flex items-center justify-between gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-ink transition hover:-translate-y-0.5 hover:text-gold-600 hover:shadow-lift"
               >
                 <span className="truncate">{r.label}</span>
-                <span aria-hidden className="text-gold-600">
-                  ↗
-                </span>
+                <ExternalLink className="h-4 w-4 shrink-0 text-gold-500" />
               </a>
             ))}
           </div>
         </div>
       ) : (
-        <p className="mt-6 text-sm text-navy-700/50">Resources coming soon.</p>
+        <p className="mt-6 text-sm text-muted/60">Resources coming soon.</p>
       )}
     </article>
   );
 }
 
 function Section({
+  icon: Icon,
   title,
   done,
   children,
 }: {
+  icon: LucideIcon;
   title: string;
   done: boolean;
   children: React.ReactNode;
 }) {
   return (
-    <section className="mt-6 border-t border-cream-200 pt-5">
-      <div className="mb-2 flex items-center gap-2">
-        <h3 className="font-semibold text-navy-900">{title}</h3>
+    <section className="mt-5 rounded-2xl border border-gray-100 bg-white/50 p-5">
+      <div className="mb-3 flex items-center gap-2.5">
+        <span
+          className={`grid h-9 w-9 place-items-center rounded-xl ${
+            done ? "bg-success-500/15 text-success-600" : "bg-indigo-50 text-indigo-600"
+          }`}
+        >
+          <Icon className="h-5 w-5" />
+        </span>
+        <h3 className="font-display text-lg font-bold text-ink">{title}</h3>
         {done && (
-          <span className="rounded-full bg-gold-500/20 px-2 py-0.5 text-xs font-semibold text-gold-600">
-            ✓ Done
+          <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-success-500/15 px-2.5 py-1 text-xs font-bold text-success-600">
+            <Check className="h-3.5 w-3.5" strokeWidth={3} /> Done
           </span>
         )}
       </div>
@@ -187,14 +206,18 @@ function TaskButton({
     <button
       onClick={onClick}
       className={[
-        "flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3 text-base font-semibold transition sm:w-auto",
+        "flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3 text-base font-bold transition sm:w-auto",
         done
-          ? "bg-gold-500 text-navy-900 hover:bg-gold-400"
-          : "border-2 border-navy-800 text-navy-800 hover:bg-navy-800 hover:text-cream-50",
+          ? "gradient-gold-green text-white shadow-soft hover:-translate-y-0.5 hover:shadow-lift"
+          : "border-2 border-indigo-200 text-indigo-700 hover:-translate-y-0.5 hover:border-indigo-500",
       ].join(" ")}
     >
-      <span className="flex h-5 w-5 items-center justify-center rounded-md border-2 border-current text-xs">
-        {done ? "✓" : ""}
+      <span
+        className={`grid h-5 w-5 place-items-center rounded-md border-2 ${
+          done ? "border-white/70 bg-white/20" : "border-current"
+        }`}
+      >
+        {done && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
       </span>
       {done ? "Completed — tap to undo" : label}
     </button>

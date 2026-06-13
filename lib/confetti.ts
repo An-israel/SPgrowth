@@ -9,7 +9,7 @@ export function fireConfetti(intense = false) {
       ...defaults,
       ...opts,
       particleCount: Math.floor(count * particleRatio),
-      colors: ["#cf9f3c", "#e0b659", "#1e2a4a", "#faf5ea", "#b3852b"],
+      colors: ["#E8B548", "#5B4BDB", "#22C55E", "#4338CA", "#f0d175"],
     });
   }
 

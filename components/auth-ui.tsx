@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { Logo } from "@/components/logo";
+import { Blobs } from "@/components/blobs";
 
 export function AuthShell({
   title,
@@ -10,17 +12,19 @@ export function AuthShell({
   children: React.ReactNode;
 }) {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-cream-100 px-4 py-12">
+    <main className="relative flex min-h-screen items-center justify-center bg-canvas px-4 py-12">
+      <Blobs />
       <div className="w-full max-w-md">
-        <Link
-          href="/"
-          className="mb-6 block text-center font-serif text-lg font-bold text-navy-800"
-        >
-          ✦ IDLC Growth
-        </Link>
-        <div className="rounded-2xl border border-cream-200 bg-white p-7 shadow-xl shadow-navy-900/5 sm:p-8">
-          <h1 className="font-serif text-2xl font-bold text-navy-900">{title}</h1>
-          <p className="mt-1 text-sm text-navy-700">{subtitle}</p>
+        <div className="mb-6 flex justify-center">
+          <Link href="/">
+            <Logo />
+          </Link>
+        </div>
+        <div className="glass-strong animate-scale-in rounded-3xl p-7 sm:p-8">
+          <h1 className="font-display text-3xl font-extrabold tracking-tight text-ink">
+            {title}
+          </h1>
+          <p className="mt-1.5 text-muted">{subtitle}</p>
           <div className="mt-6">{children}</div>
         </div>
       </div>
@@ -45,14 +49,12 @@ export function Field({
 >) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-sm font-medium text-navy-800">
-        {label}
-      </span>
+      <span className="mb-1.5 block text-sm font-semibold text-ink">{label}</span>
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-xl border border-cream-200 bg-cream-50 px-4 py-3 text-navy-900 outline-none transition focus:border-gold-400 focus:ring-2 focus:ring-gold-400/30"
+        className="w-full rounded-xl border border-gray-200 bg-white/80 px-4 py-3 text-ink outline-none transition placeholder:text-muted/60 focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20"
         {...rest}
       />
     </label>
@@ -70,11 +72,32 @@ export function FormMessage({
     <p
       className={
         kind === "error"
-          ? "rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700"
-          : "rounded-lg bg-gold-400/15 px-3 py-2 text-sm text-navy-800"
+          ? "rounded-xl border border-red-100 bg-red-50 px-3 py-2.5 text-sm text-red-600"
+          : "rounded-xl border border-success-500/20 bg-success-500/10 px-3 py-2.5 text-sm text-success-600"
       }
     >
       {children}
     </p>
+  );
+}
+
+/** Bold gradient submit button shared across auth forms. */
+export function SubmitButton({
+  loading,
+  children,
+  loadingText,
+}: {
+  loading: boolean;
+  children: React.ReactNode;
+  loadingText: string;
+}) {
+  return (
+    <button
+      type="submit"
+      disabled={loading}
+      className="w-full rounded-xl gradient-gold-indigo px-6 py-3.5 font-bold text-white shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift disabled:translate-y-0 disabled:opacity-60"
+    >
+      {loading ? loadingText : children}
+    </button>
   );
 }

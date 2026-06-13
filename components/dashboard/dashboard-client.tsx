@@ -7,6 +7,8 @@ import { TOTAL_DAYS, isProgressComplete } from "@/lib/program";
 import { getCelebrationMessage, type CelebrationMessage } from "@/lib/celebration";
 import { fireConfetti } from "@/lib/confetti";
 import { SignOutButton } from "@/components/sign-out-button";
+import { Logo } from "@/components/logo";
+import { Blobs } from "@/components/blobs";
 import { DaySelector, type DayState } from "./day-selector";
 import { DayCard } from "./day-card";
 import { CelebrationModal } from "./celebration-modal";
@@ -158,25 +160,25 @@ export function DashboardClient({
   const progressPct = Math.round((completedCount / TOTAL_DAYS) * 100);
 
   return (
-    <div className="min-h-screen bg-cream-100">
+    <div className="relative min-h-screen bg-canvas">
+      <Blobs />
+
       {/* Header */}
-      <header className="border-b border-cream-200 bg-white">
+      <header className="sticky top-0 z-30 border-b border-white/40 bg-white/60 backdrop-blur-lg">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-3">
-          <span className="font-serif text-lg font-bold text-navy-800">
-            ✦ IDLC Growth
-          </span>
+          <Logo />
           <div className="flex items-center gap-2">
             {isAdmin && (
               <Link
                 href="/admin"
-                className="rounded-lg border border-cream-200 px-3 py-1.5 text-sm font-medium text-navy-700 transition hover:bg-cream-100"
+                className="rounded-xl border border-gray-200 bg-white/60 px-3.5 py-1.5 text-sm font-semibold text-muted backdrop-blur transition hover:border-indigo-200 hover:text-indigo-700"
               >
                 Admin
               </Link>
             )}
             <Link
               href="/dashboard/growth-plan"
-              className="rounded-lg border border-cream-200 px-3 py-1.5 text-sm font-medium text-navy-700 transition hover:bg-cream-100"
+              className="hidden rounded-xl border border-gray-200 bg-white/60 px-3.5 py-1.5 text-sm font-semibold text-muted backdrop-blur transition hover:border-indigo-200 hover:text-indigo-700 sm:inline-block"
             >
               Growth Plan
             </Link>
@@ -188,16 +190,20 @@ export function DashboardClient({
       <main className="mx-auto max-w-3xl px-4 py-6">
         {/* Welcome + progress */}
         <section className="mb-6">
-          <h1 className="font-serif text-2xl font-bold text-navy-900">
-            Welcome, {fullName.split(" ")[0]}
-          </h1>
-          <p className="mt-0.5 text-sm text-navy-700">
-            Day {currentDay} of {TOTAL_DAYS} · {completedCount} day
-            {completedCount === 1 ? "" : "s"} completed
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h1 className="font-display text-3xl font-extrabold tracking-tight text-ink">
+              Welcome, {fullName.split(" ")[0]}
+            </h1>
+            <span className="inline-flex items-center gap-1.5 rounded-full gradient-gold-indigo px-3.5 py-1.5 text-sm font-bold text-white shadow-soft">
+              Day {currentDay} of {TOTAL_DAYS}
+            </span>
+          </div>
+          <p className="mt-1 text-sm font-medium text-muted">
+            {completedCount} of {TOTAL_DAYS} days completed · {progressPct}%
           </p>
-          <div className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-cream-200">
+          <div className="mt-3 h-3 w-full overflow-hidden rounded-full bg-gray-100">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-gold-500 to-gold-400 transition-all duration-500"
+              className="h-full rounded-full gradient-gold-green transition-all duration-700"
               style={{ width: `${progressPct}%` }}
             />
           </div>
@@ -228,13 +234,13 @@ export function DashboardClient({
           />
         )}
 
-        <div className="mt-8 rounded-2xl border border-cream-200 bg-white p-5 text-center">
-          <p className="font-serif text-lg text-navy-900">
+        <div className="glass mt-8 rounded-3xl p-6 text-center">
+          <p className="font-display text-xl font-bold text-ink">
             Ready to plan your future growth?
           </p>
           <Link
             href="/dashboard/growth-plan"
-            className="mt-3 inline-block rounded-xl bg-navy-800 px-6 py-3 font-semibold text-cream-50 transition hover:bg-navy-700"
+            className="mt-4 inline-block rounded-xl gradient-gold-indigo px-6 py-3.5 font-bold text-white shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift"
           >
             My Spiritual Growth Plan
           </Link>

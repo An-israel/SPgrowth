@@ -4,7 +4,7 @@ import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { AuthShell, Field, FormMessage } from "@/components/auth-ui";
+import { AuthShell, Field, FormMessage, SubmitButton } from "@/components/auth-ui";
 
 function LoginForm() {
   const router = useRouter();
@@ -60,16 +60,12 @@ function LoginForm() {
 
       {error && <FormMessage kind="error">{error}</FormMessage>}
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full rounded-xl bg-navy-800 px-6 py-3 font-semibold text-cream-50 transition hover:bg-navy-700 disabled:opacity-60"
-      >
-        {loading ? "Signing in…" : "Sign In"}
-      </button>
+      <SubmitButton loading={loading} loadingText="Signing in…">
+        Sign In
+      </SubmitButton>
 
       <div className="text-center">
-        <Link href="/forgot-password" className="text-sm font-medium text-gold-600 hover:underline">
+        <Link href="/forgot-password" className="text-sm font-semibold text-indigo-600 hover:underline">
           Forgot password?
         </Link>
       </div>
@@ -83,9 +79,9 @@ export default function LoginPage() {
       <Suspense fallback={null}>
         <LoginForm />
       </Suspense>
-      <p className="mt-6 text-center text-sm text-navy-700">
+      <p className="mt-6 text-center text-sm text-muted">
         New here?{" "}
-        <Link href="/signup" className="font-semibold text-gold-600 hover:underline">
+        <Link href="/signup" className="font-semibold text-indigo-600 hover:underline">
           Create an account
         </Link>
       </p>
