@@ -9,10 +9,11 @@ import {
   Flame,
   ExternalLink,
   Sparkles,
+  Sunrise,
   type LucideIcon,
 } from "lucide-react";
 import type { DailyContent } from "@/types/database";
-import type { LocalProgress } from "./dashboard-client";
+import type { LocalProgress, ToggleField } from "./dashboard-client";
 
 const WEEK_TITLES: Record<number, string> = {
   1: "Week 1 · Locating Yourself Spiritually",
@@ -29,7 +30,7 @@ export function DayCard({
 }: {
   day: DailyContent;
   progress: LocalProgress;
-  onToggle: (field: "reading_done" | "exercise_done" | "prayer_done") => void;
+  onToggle: (field: ToggleField) => void;
   onResponseChange: (value: string) => void;
   responseSaving: boolean;
 }) {
@@ -119,6 +120,20 @@ export function DayCard({
         />
       </Section>
 
+      {/* Prophetic Takeoff (PT) — daily church morning prayer */}
+      <Section icon={Sunrise} title="Prophetic Takeoff (PT)" done={progress.pt_done}>
+        <p className="text-muted">
+          Did you join PT today? Our morning prayer (Prophetic Takeoff) holds
+          daily from <span className="font-semibold text-ink">5:00–6:00am</span>.
+        </p>
+        <TaskButton
+          done={progress.pt_done}
+          label="Yes, I joined PT"
+          doneLabel="Joined PT — tap to undo"
+          onClick={() => onToggle("pt_done")}
+        />
+      </Section>
+
       {/* Weekly Challenge (review days only) */}
       {day.is_review_day && day.weekly_challenge && (
         <div className="mt-6 overflow-hidden rounded-2xl gradient-gold-indigo p-5 text-white shadow-soft">
@@ -196,10 +211,12 @@ function Section({
 function TaskButton({
   done,
   label,
+  doneLabel = "Completed — tap to undo",
   onClick,
 }: {
   done: boolean;
   label: string;
+  doneLabel?: string;
   onClick: () => void;
 }) {
   return (
@@ -219,7 +236,7 @@ function TaskButton({
       >
         {done && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
       </span>
-      {done ? "Completed — tap to undo" : label}
+      {done ? doneLabel : label}
     </button>
   );
 }

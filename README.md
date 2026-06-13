@@ -60,9 +60,10 @@ In the Supabase dashboard, open the **SQL Editor** and run the files in
    progress completion timestamp)
 2. `0002_rls.sql` — Row Level Security policies
 3. `0003_seed.sql` — all 21 days of content
+4. `0004_add_pt.sql` — adds the Prophetic Takeoff (PT) daily-prayer field
 
 Re-running `0003_seed.sql` is safe; it upserts content and preserves any
-admin-edited `resources`.
+admin-edited `resources`. All migrations are idempotent and safe to re-run.
 
 ## 3. Configure environment variables
 

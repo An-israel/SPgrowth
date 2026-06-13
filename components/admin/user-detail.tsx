@@ -65,6 +65,9 @@ export function UserDetail({
 
         <p className="mt-4 text-sm font-bold text-ink">
           Progress: {row.completedDays}/{TOTAL_DAYS} days completed
+          <span className="ml-2 font-semibold text-gold-600">
+            · PT joined: {row.progress.filter((p) => p.pt_done).length}/{TOTAL_DAYS}
+          </span>
         </p>
 
         {/* Day-by-day grid */}

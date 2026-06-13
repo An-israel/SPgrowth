@@ -35,6 +35,7 @@ export type UserProgress = {
   reading_done: boolean;
   exercise_done: boolean;
   prayer_done: boolean;
+  pt_done: boolean;
   exercise_response: string | null;
   completed_at: string | null;
   updated_at: string;

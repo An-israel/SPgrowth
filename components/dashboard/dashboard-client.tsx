@@ -18,6 +18,7 @@ export interface LocalProgress {
   reading_done: boolean;
   exercise_done: boolean;
   prayer_done: boolean;
+  pt_done: boolean;
   exercise_response: string | null;
 }
 
@@ -25,6 +26,7 @@ const EMPTY: LocalProgress = {
   reading_done: false,
   exercise_done: false,
   prayer_done: false,
+  pt_done: false,
   exercise_response: null,
 };
 
@@ -35,11 +37,18 @@ function buildMap(rows: UserProgress[]): Record<number, LocalProgress> {
       reading_done: r.reading_done,
       exercise_done: r.exercise_done,
       prayer_done: r.prayer_done,
+      pt_done: r.pt_done,
       exercise_response: r.exercise_response,
     };
   }
   return map;
 }
+
+export type ToggleField =
+  | "reading_done"
+  | "exercise_done"
+  | "prayer_done"
+  | "pt_done";
 
 export function DashboardClient({
   userId,
@@ -81,7 +90,8 @@ export function DashboardClient({
       const p = progress[day];
       if (!p) return "not-started";
       if (isProgressComplete(p)) return "complete";
-      if (p.reading_done || p.exercise_done || p.prayer_done) return "in-progress";
+      if (p.reading_done || p.exercise_done || p.prayer_done || p.pt_done)
+        return "in-progress";
       return "not-started";
     },
     [progress]
@@ -103,6 +113,7 @@ export function DashboardClient({
           reading_done: next.reading_done,
           exercise_done: next.exercise_done,
           prayer_done: next.prayer_done,
+          pt_done: next.pt_done,
           exercise_response: next.exercise_response,
         },
         { onConflict: "user_id,day_number" }
@@ -124,7 +135,7 @@ export function DashboardClient({
   );
 
   const handleToggle = useCallback(
-    (day: number, field: "reading_done" | "exercise_done" | "prayer_done") => {
+    (day: number, field: ToggleField) => {
       const current = progress[day] ?? EMPTY;
       persist(day, { [field]: !current[field] });
     },
