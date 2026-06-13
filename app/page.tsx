@@ -1,69 +1,96 @@
 import Link from "next/link";
+import { ArrowRight, Sparkles, BookOpen, Heart, Sprout } from "lucide-react";
+import { Logo } from "@/components/logo";
+import { Blobs } from "@/components/blobs";
 import { THEME_SCRIPTURE, THEME_SCRIPTURE_REF } from "@/lib/program";
 
 export default function LandingPage() {
   return (
-    <main className="relative min-h-screen overflow-hidden bg-gradient-to-b from-navy-900 via-navy-800 to-navy-900 text-cream-50">
-      {/* Soft radial glow */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-1/2 top-0 h-[40rem] w-[40rem] -translate-x-1/2 rounded-full bg-gold-500/10 blur-3xl" />
-      </div>
+    <main className="relative min-h-screen bg-canvas">
+      <Blobs />
 
-      <div className="relative mx-auto flex min-h-screen max-w-4xl flex-col items-center justify-center px-6 py-16 text-center">
-        <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-gold-400/40 bg-gold-400/10 px-4 py-1.5 text-sm font-medium tracking-wide text-gold-400">
-          ✦ Light to the World
+      {/* Top bar */}
+      <header className="mx-auto flex max-w-5xl items-center justify-between px-6 py-5">
+        <Logo />
+        <Link
+          href="/login"
+          className="rounded-xl px-4 py-2 text-sm font-semibold text-indigo-700 transition hover:bg-indigo-50"
+        >
+          Sign In
+        </Link>
+      </header>
+
+      <div className="mx-auto flex max-w-3xl flex-col items-center px-6 pb-20 pt-8 text-center sm:pt-14">
+        <span className="inline-flex items-center gap-2 rounded-full border border-gold-200 bg-gold-50/70 px-4 py-1.5 text-sm font-semibold text-gold-600 backdrop-blur">
+          <Sparkles className="h-4 w-4" /> Light to the World
         </span>
 
-        <h1 className="font-serif text-4xl font-bold leading-tight sm:text-6xl">
-          The 21-Day Spiritual
+        <h1 className="mt-6 font-display text-5xl font-extrabold leading-[1.05] tracking-tight text-ink sm:text-7xl">
+          The 21-Day
           <br />
-          Growth Journey
+          <span className="text-gradient">Spiritual Growth</span>
+          <br />
+          Journey
         </h1>
 
-        <p className="mt-6 max-w-xl text-base leading-relaxed text-cream-100/80 sm:text-lg">
+        <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">
           A three-week guided journey for undergraduate students, based on
           Kenneth E. Hagin&apos;s{" "}
-          <span className="italic">Growing Up, Spiritually</span>. Each day
-          brings a reading, a key truth, a practical exercise, and a prayer
-          focus — to help you grow up in all things into Christ.
+          <span className="font-semibold text-ink">Growing Up, Spiritually</span>
+          . A reading, a key truth, a practical exercise, and a prayer focus —
+          every single day.
         </p>
 
-        <blockquote className="mt-10 max-w-2xl border-l-2 border-gold-400/60 pl-5 text-left">
-          <p className="font-serif text-lg italic text-cream-50 sm:text-xl">
-            &ldquo;{THEME_SCRIPTURE}&rdquo;
-          </p>
-          <footer className="mt-2 text-sm font-medium text-gold-400">
-            {THEME_SCRIPTURE_REF}
-          </footer>
-        </blockquote>
+        {/* Scripture glass card */}
+        <div className="glass mt-10 w-full max-w-2xl rounded-3xl p-7 text-left">
+          <div className="flex items-start gap-4">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl gradient-gold-indigo text-white">
+              <Sprout className="h-5 w-5" />
+            </span>
+            <div>
+              <p className="font-display text-xl font-bold leading-snug text-ink">
+                &ldquo;{THEME_SCRIPTURE}&rdquo;
+              </p>
+              <p className="mt-2 text-sm font-semibold text-indigo-600">
+                {THEME_SCRIPTURE_REF}
+              </p>
+            </div>
+          </div>
+        </div>
 
-        <div className="mt-12 flex w-full flex-col items-center justify-center gap-3 sm:flex-row">
+        {/* CTAs */}
+        <div className="mt-9 flex w-full flex-col items-center justify-center gap-3 sm:flex-row">
           <Link
             href="/signup"
-            className="w-full rounded-xl bg-gold-500 px-8 py-3.5 text-center text-base font-semibold text-navy-900 shadow-lg shadow-gold-500/20 transition hover:bg-gold-400 sm:w-auto"
+            className="group flex w-full items-center justify-center gap-2 rounded-xl gradient-gold-indigo px-8 py-4 text-base font-bold text-white shadow-lift transition hover:-translate-y-0.5 hover:shadow-glow sm:w-auto"
           >
             Start the Journey
+            <ArrowRight className="h-5 w-5 transition group-hover:translate-x-0.5" />
           </Link>
           <Link
             href="/login"
-            className="w-full rounded-xl border border-cream-100/30 px-8 py-3.5 text-center text-base font-semibold text-cream-50 transition hover:bg-cream-50/10 sm:w-auto"
+            className="w-full rounded-xl border-2 border-indigo-200 bg-white/60 px-8 py-4 text-base font-bold text-indigo-700 backdrop-blur transition hover:-translate-y-0.5 hover:border-indigo-500 sm:w-auto"
           >
             Sign In
           </Link>
         </div>
 
+        {/* Week pillars */}
         <div className="mt-16 grid w-full max-w-2xl grid-cols-1 gap-4 sm:grid-cols-3">
           {[
-            { n: "Week 1", t: "Locating Yourself Spiritually" },
-            { n: "Week 2", t: "Walking With Your Father" },
-            { n: "Week 3", t: "The Spiritual Man" },
+            { icon: BookOpen, n: "Week 1", t: "Locating Yourself Spiritually" },
+            { icon: Heart, n: "Week 2", t: "Walking With Your Father" },
+            { icon: Sprout, n: "Week 3", t: "The Spiritual Man" },
           ].map((w) => (
             <div
               key={w.n}
-              className="rounded-xl border border-cream-100/10 bg-cream-50/5 p-4 text-left"
+              className="glass rounded-2xl p-5 text-left transition hover:-translate-y-1 hover:shadow-lift"
             >
-              <p className="text-sm font-semibold text-gold-400">{w.n}</p>
-              <p className="mt-1 text-sm text-cream-100/80">{w.t}</p>
+              <span className="grid h-10 w-10 place-items-center rounded-xl bg-indigo-50 text-indigo-600">
+                <w.icon className="h-5 w-5" />
+              </span>
+              <p className="mt-3 text-sm font-bold text-gold-600">{w.n}</p>
+              <p className="mt-0.5 text-sm font-medium text-ink">{w.t}</p>
             </div>
           ))}
         </div>

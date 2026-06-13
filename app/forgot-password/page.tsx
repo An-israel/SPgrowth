@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { AuthShell, Field, FormMessage } from "@/components/auth-ui";
+import { AuthShell, Field, FormMessage, SubmitButton } from "@/components/auth-ui";
 
 export default function ForgotPasswordPage() {
   const supabase = createClient();
@@ -47,7 +47,7 @@ export default function ForgotPasswordPage() {
           </FormMessage>
           <Link
             href="/login"
-            className="block rounded-xl bg-navy-800 px-6 py-3 text-center font-semibold text-cream-50 transition hover:bg-navy-700"
+            className="block rounded-xl gradient-gold-indigo px-6 py-3.5 text-center font-bold text-white shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift"
           >
             Back to Sign In
           </Link>
@@ -56,15 +56,11 @@ export default function ForgotPasswordPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <Field label="Email" type="email" value={email} onChange={setEmail} autoComplete="email" required />
           {error && <FormMessage kind="error">{error}</FormMessage>}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-xl bg-navy-800 px-6 py-3 font-semibold text-cream-50 transition hover:bg-navy-700 disabled:opacity-60"
-          >
-            {loading ? "Sending…" : "Send Reset Link"}
-          </button>
+          <SubmitButton loading={loading} loadingText="Sending…">
+            Send Reset Link
+          </SubmitButton>
           <div className="text-center">
-            <Link href="/login" className="text-sm font-medium text-gold-600 hover:underline">
+            <Link href="/login" className="text-sm font-semibold text-indigo-600 hover:underline">
               Back to Sign In
             </Link>
           </div>

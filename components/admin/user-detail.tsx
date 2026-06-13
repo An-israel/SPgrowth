@@ -29,41 +29,41 @@ export function UserDetail({
 
   function cellState(day: number): string {
     const p = progressByDay.get(day);
-    if (!p) return "bg-cream-200 text-navy-700/40";
-    if (isProgressComplete(p)) return "bg-gold-500 text-navy-900";
+    if (!p) return "bg-gray-100 text-muted/40";
+    if (isProgressComplete(p)) return "gradient-gold-green text-white";
     if (p.reading_done || p.exercise_done || p.prayer_done)
-      return "bg-navy-700 text-cream-50";
-    return "bg-cream-200 text-navy-700/40";
+      return "bg-indigo-500 text-white";
+    return "bg-gray-100 text-muted/40";
   }
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-navy-900/60 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-ink/20 p-4 backdrop-blur-md"
       onClick={onClose}
     >
       <div
-        className="my-8 w-full max-w-2xl animate-scale-in rounded-2xl bg-white p-6 shadow-2xl"
+        className="glass-strong my-8 w-full max-w-2xl animate-scale-in rounded-3xl p-6 shadow-lift"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between">
           <div>
-            <h2 className="font-serif text-2xl font-bold text-navy-900">
+            <h2 className="font-display text-2xl font-extrabold tracking-tight text-ink">
               {row.profile.full_name || "Unnamed"}
             </h2>
-            <div className="mt-1 space-y-0.5 text-sm text-navy-700">
+            <div className="mt-1 space-y-0.5 text-sm text-muted">
               <CopyLine label="Email" value={row.profile.email} />
               <CopyLine label="Phone" value={row.profile.phone_number || "—"} />
             </div>
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg border border-cream-200 px-3 py-1.5 text-sm text-navy-700 hover:bg-cream-100"
+            className="rounded-xl border border-gray-200 bg-white/60 px-3.5 py-1.5 text-sm font-semibold text-muted transition hover:border-indigo-200 hover:text-indigo-700"
           >
             Close
           </button>
         </div>
 
-        <p className="mt-4 text-sm font-semibold text-navy-900">
+        <p className="mt-4 text-sm font-bold text-ink">
           Progress: {row.completedDays}/{TOTAL_DAYS} days completed
         </p>
 
@@ -81,11 +81,11 @@ export function UserDetail({
         </div>
 
         {/* Exercise responses */}
-        <h3 className="mt-6 font-semibold text-navy-900">Exercise Responses</h3>
+        <h3 className="mt-6 font-display text-lg font-bold text-ink">Exercise Responses</h3>
         <div className="mt-2 space-y-2">
           {row.progress.filter((p) => p.exercise_response?.trim()).length ===
           0 ? (
-            <p className="text-sm text-navy-700/60">No responses yet.</p>
+            <p className="text-sm text-muted/60">No responses yet.</p>
           ) : (
             days.map((d) => {
               const p = progressByDay.get(d.day_number);
@@ -93,12 +93,12 @@ export function UserDetail({
               return (
                 <div
                   key={d.day_number}
-                  className="rounded-lg border border-cream-200 bg-cream-50 p-3"
+                  className="rounded-xl border border-gray-100 bg-white/60 p-3"
                 >
-                  <p className="text-xs font-semibold text-gold-600">
+                  <p className="text-xs font-bold text-gold-600">
                     Day {d.day_number} · {d.topic}
                   </p>
-                  <p className="mt-1 whitespace-pre-wrap text-sm text-navy-800">
+                  <p className="mt-1 whitespace-pre-wrap text-sm text-ink">
                     {p.exercise_response}
                   </p>
                 </div>
@@ -108,9 +108,9 @@ export function UserDetail({
         </div>
 
         {/* Growth plan */}
-        <h3 className="mt-6 font-semibold text-navy-900">Final Growth Plan</h3>
+        <h3 className="mt-6 font-display text-lg font-bold text-ink">Final Growth Plan</h3>
         {row.plan?.submitted_at ? (
-          <div className="mt-2 space-y-2 rounded-lg border border-cream-200 bg-cream-50 p-3 text-sm text-navy-800">
+          <div className="mt-2 space-y-2 rounded-xl border border-gray-100 bg-white/60 p-3 text-sm text-ink">
             <PlanRow label="Greatest Area of Growth" value={row.plan.greatest_area_of_growth} />
             <PlanRow label="Biggest Spiritual Challenge" value={row.plan.biggest_spiritual_challenge} />
             <PlanRow label="Habit #1" value={row.plan.habit_1} />
@@ -120,7 +120,7 @@ export function UserDetail({
             <PlanRow label="90-Day Goal" value={row.plan.ninety_day_goal} />
           </div>
         ) : (
-          <p className="mt-2 text-sm text-navy-700/60">Not submitted yet.</p>
+          <p className="mt-2 text-sm text-muted/60">Not submitted yet.</p>
         )}
       </div>
     </div>
@@ -130,7 +130,7 @@ export function UserDetail({
 function PlanRow({ label, value }: { label: string; value: string | null }) {
   return (
     <div>
-      <span className="font-semibold">{label}: </span>
+      <span className="font-bold">{label}: </span>
       <span>{value || "—"}</span>
     </div>
   );
@@ -145,7 +145,7 @@ function CopyLine({ label, value }: { label: string; value: string }) {
       {value && value !== "—" && (
         <button
           onClick={() => navigator.clipboard?.writeText(value)}
-          className="rounded border border-cream-200 px-1.5 py-0.5 text-xs text-gold-600 hover:bg-cream-100"
+          className="rounded-md border border-gray-200 px-1.5 py-0.5 text-xs font-semibold text-gold-600 transition hover:bg-gold-50"
           title={`Copy ${label.toLowerCase()}`}
         >
           Copy
