@@ -4,7 +4,13 @@ import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { AuthShell, Field, FormMessage, SubmitButton } from "@/components/auth-ui";
+import {
+  AuthShell,
+  Field,
+  FormMessage,
+  SubmitButton,
+  friendlyAuthError,
+} from "@/components/auth-ui";
 
 function LoginForm() {
   const router = useRouter();
@@ -21,36 +27,41 @@ function LoginForm() {
     setError(null);
     setLoading(true);
 
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (signInError) {
-      setError(signInError.message);
-      setLoading(false);
-      return;
-    }
-
-    // Route admins to /admin, everyone else to /dashboard (or original target).
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    let destination = searchParams.get("redirectedFrom") || "/dashboard";
-    if (user) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", user.id)
-        .single();
-      if (profile?.role === "admin" && destination === "/dashboard") {
-        destination = "/admin";
+      if (signInError) {
+        setError(friendlyAuthError(signInError.message));
+        setLoading(false);
+        return;
       }
-    }
 
-    router.push(destination);
-    router.refresh();
+      // Route admins to /admin, everyone else to /dashboard (or original target).
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      let destination = searchParams.get("redirectedFrom") || "/dashboard";
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", user.id)
+          .single();
+        if (profile?.role === "admin" && destination === "/dashboard") {
+          destination = "/admin";
+        }
+      }
+
+      router.push(destination);
+      router.refresh();
+    } catch (err) {
+      setError(friendlyAuthError(err instanceof Error ? err.message : String(err)));
+      setLoading(false);
+    }
   }
 
   return (

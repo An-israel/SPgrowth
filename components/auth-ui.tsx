@@ -81,6 +81,26 @@ export function FormMessage({
   );
 }
 
+/**
+ * Turn raw Supabase/auth errors into clear, friendly messages. A "Failed to
+ * fetch" almost always means the app can't reach Supabase — usually because the
+ * NEXT_PUBLIC_SUPABASE_* env vars are missing on the deployment.
+ */
+export function friendlyAuthError(message: string): string {
+  const m = message.toLowerCase();
+  if (
+    m.includes("failed to fetch") ||
+    m.includes("networkerror") ||
+    m.includes("load failed")
+  ) {
+    return "Couldn't reach the server. The app may be missing its Supabase configuration — set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in Vercel and redeploy.";
+  }
+  if (m.includes("invalid login credentials")) {
+    return "Incorrect email or password. Please try again.";
+  }
+  return message;
+}
+
 /** Bold gradient submit button shared across auth forms. */
 export function SubmitButton({
   loading,

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Sparkles, BookOpen, Heart, Sprout } from "lucide-react";
+import { ArrowRight, BookOpen, Heart, Sprout } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { Blobs } from "@/components/blobs";
 import { THEME_SCRIPTURE, THEME_SCRIPTURE_REF } from "@/lib/program";
@@ -20,12 +20,8 @@ export default function LandingPage() {
         </Link>
       </header>
 
-      <div className="mx-auto flex max-w-3xl flex-col items-center px-6 pb-20 pt-8 text-center sm:pt-14">
-        <span className="inline-flex items-center gap-2 rounded-full border border-gold-200 bg-gold-50/70 px-4 py-1.5 text-sm font-semibold text-gold-600 backdrop-blur">
-          <Sparkles className="h-4 w-4" /> Light to the World
-        </span>
-
-        <h1 className="mt-6 font-display text-5xl font-extrabold leading-[1.05] tracking-tight text-ink sm:text-7xl">
+      <div className="mx-auto flex max-w-3xl flex-col items-center px-6 pb-20 pt-12 text-center sm:pt-20">
+        <h1 className="font-display text-5xl font-extrabold leading-[1.05] tracking-tight text-ink sm:text-7xl">
           The 21-Day
           <br />
           <span className="text-gradient">Spiritual Growth</span>

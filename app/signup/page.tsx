@@ -4,7 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { AuthShell, Field, FormMessage, SubmitButton } from "@/components/auth-ui";
+import {
+  AuthShell,
+  Field,
+  FormMessage,
+  SubmitButton,
+  friendlyAuthError,
+} from "@/components/auth-ui";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -24,27 +30,32 @@ export default function SignUpPage() {
     setInfo(null);
     setLoading(true);
 
-    const { data, error: signUpError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: fullName, phone_number: phone },
-      },
-    });
+    try {
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { full_name: fullName, phone_number: phone },
+        },
+      });
 
-    if (signUpError) {
-      setError(signUpError.message);
-      setLoading(false);
-      return;
-    }
+      if (signUpError) {
+        setError(friendlyAuthError(signUpError.message));
+        setLoading(false);
+        return;
+      }
 
-    if (data.session) {
-      router.push("/dashboard");
-      router.refresh();
-    } else {
-      setInfo(
-        "Account created! Please check your email to confirm your address, then sign in."
-      );
+      if (data.session) {
+        router.push("/dashboard");
+        router.refresh();
+      } else {
+        setInfo(
+          "Account created! Please check your email to confirm your address, then sign in."
+        );
+        setLoading(false);
+      }
+    } catch (err) {
+      setError(friendlyAuthError(err instanceof Error ? err.message : String(err)));
       setLoading(false);
     }
   }
