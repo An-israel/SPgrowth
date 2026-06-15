@@ -61,6 +61,7 @@ In the Supabase dashboard, open the **SQL Editor** and run the files in
 2. `0002_rls.sql` — Row Level Security policies
 3. `0003_seed.sql` — all 21 days of content
 4. `0004_add_pt.sql` — adds the Prophetic Takeoff (PT) daily-prayer field
+5. `0005_admin_manage_roles.sql` — lets admins update other users' roles
 
 Re-running `0003_seed.sql` is safe; it upserts content and preserves any
 admin-edited `resources`. All migrations are idempotent and safe to re-run.
@@ -89,8 +90,8 @@ Visit http://localhost:3000.
 
 ## 5. Make a user an admin
 
-There is no public admin signup. After a user signs up, promote them via the
-SQL Editor:
+There is no public admin signup. Bootstrap the **first** admin via the SQL
+Editor:
 
 ```sql
 update public.profiles
@@ -98,8 +99,12 @@ set role = 'admin'
 where email = 'admin@example.com';
 ```
 
-That user will now be routed to `/admin` on sign-in and can access the admin
-dashboard.
+That user will now be routed to `/admin` on sign-in. **After that, admins can
+promote or revoke other admins directly from the dashboard** — open a user from
+the Users tab and click **Promote to Admin** (revoke from the Admins panel or
+the user's detail view). You cannot revoke your own admin access, preventing
+accidental lockout. Promoted users get the exact same admin dashboard; the
+change takes effect on their next navigation/refresh.
 
 ## 6. Deploy to Vercel
 
