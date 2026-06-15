@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { TOTAL_DAYS, isProgressComplete } from "@/lib/program";
 import { SignOutButton } from "@/components/sign-out-button";
 import { Blobs } from "@/components/blobs";
-import { Users, TrendingUp, Award, Clock, Search } from "lucide-react";
+import { Users, TrendingUp, Award, Clock, Search, ShieldCheck } from "lucide-react";
 import { ResourcesManager } from "./resources-manager";
 import { UserDetail, type UserRow } from "./user-detail";
 import type {
@@ -14,6 +14,7 @@ import type {
   FinalGrowthPlan,
   Profile,
   UserProgress,
+  UserRole,
 } from "@/types/database";
 
 type Tab = "users" | "resources" | "settings";
@@ -23,6 +24,7 @@ type SortKey = "name" | "completed" | "active";
 const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
 
 export function AdminClient({
+  currentUserId,
   profiles,
   progress,
   days,
@@ -30,6 +32,7 @@ export function AdminClient({
   programStartDate,
   currentDay,
 }: {
+  currentUserId: string;
   profiles: Profile[];
   progress: UserProgress[];
   days: DailyContent[];
@@ -37,13 +40,40 @@ export function AdminClient({
   programStartDate: string;
   currentDay: number;
 }) {
+  const supabase = createClient();
   const [tab, setTab] = useState<Tab>("users");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [sortKey, setSortKey] = useState<SortKey>("name");
   const [detail, setDetail] = useState<UserRow | null>(null);
 
-  // Aggregate per-user data once.
+  // Local copy of profiles so role changes reflect instantly.
+  const [profileList, setProfileList] = useState<Profile[]>(profiles);
+  const [roleSavingId, setRoleSavingId] = useState<string | null>(null);
+
+  async function setRole(userId: string, role: UserRole) {
+    setRoleSavingId(userId);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ role })
+      .eq("id", userId);
+    setRoleSavingId(null);
+    if (!error) {
+      setProfileList((list) =>
+        list.map((p) => (p.id === userId ? { ...p, role } : p))
+      );
+      setDetail(null);
+    } else {
+      alert(`Could not update role: ${error.message}`);
+    }
+  }
+
+  const admins = useMemo(
+    () => profileList.filter((p) => p.role === "admin"),
+    [profileList]
+  );
+
+  // Aggregate per-user data once (students only — admins are managed separately).
   const rows: UserRow[] = useMemo(() => {
     const progByUser = new Map<string, UserProgress[]>();
     for (const p of progress) {
@@ -53,7 +83,7 @@ export function AdminClient({
     }
     const planByUser = new Map(plans.map((p) => [p.user_id, p]));
 
-    return profiles
+    return profileList
       .filter((pr) => pr.role !== "admin")
       .map((profile) => {
         const userProgress = progByUser.get(profile.id) ?? [];
@@ -73,7 +103,7 @@ export function AdminClient({
           lastActive,
         };
       });
-  }, [profiles, progress, plans]);
+  }, [profileList, progress, plans]);
 
   // Overview stats.
   const stats = useMemo(() => {
@@ -180,17 +210,25 @@ export function AdminClient({
 
         <div className="mt-5">
           {tab === "users" && (
-            <UsersTab
-              rows={visibleRows}
-              search={search}
-              setSearch={setSearch}
-              statusFilter={statusFilter}
-              setStatusFilter={setStatusFilter}
-              sortKey={sortKey}
-              setSortKey={setSortKey}
-              isOnTrack={isOnTrack}
-              onSelect={setDetail}
-            />
+            <>
+              <AdminsPanel
+                admins={admins}
+                currentUserId={currentUserId}
+                roleSavingId={roleSavingId}
+                onRevoke={(id) => setRole(id, "student")}
+              />
+              <UsersTab
+                rows={visibleRows}
+                search={search}
+                setSearch={setSearch}
+                statusFilter={statusFilter}
+                setStatusFilter={setStatusFilter}
+                sortKey={sortKey}
+                setSortKey={setSortKey}
+                isOnTrack={isOnTrack}
+                onSelect={setDetail}
+              />
+            </>
           )}
           {tab === "resources" && <ResourcesManager days={days} />}
           {tab === "settings" && (
@@ -200,8 +238,76 @@ export function AdminClient({
       </main>
 
       {detail && (
-        <UserDetail row={detail} days={days} onClose={() => setDetail(null)} />
+        <UserDetail
+          row={detail}
+          days={days}
+          currentUserId={currentUserId}
+          roleSaving={roleSavingId === detail.profile.id}
+          onSetRole={setRole}
+          onClose={() => setDetail(null)}
+        />
       )}
+    </div>
+  );
+}
+
+function AdminsPanel({
+  admins,
+  currentUserId,
+  roleSavingId,
+  onRevoke,
+}: {
+  admins: Profile[];
+  currentUserId: string;
+  roleSavingId: string | null;
+  onRevoke: (id: string) => void;
+}) {
+  return (
+    <div className="glass mb-4 rounded-2xl p-4">
+      <div className="flex items-center gap-2">
+        <ShieldCheck className="h-5 w-5 text-indigo-600" />
+        <h3 className="font-display text-base font-bold text-ink">
+          Admins ({admins.length})
+        </h3>
+      </div>
+      <p className="mt-1 text-xs text-muted">
+        Admins see this dashboard. Promote a student from their detail view; revoke here.
+      </p>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {admins.map((a) => {
+          const isSelf = a.id === currentUserId;
+          return (
+            <span
+              key={a.id}
+              className="inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-white/70 py-1 pl-3 pr-1.5 text-sm"
+            >
+              <span className="font-semibold text-ink">
+                {a.full_name || a.email}
+              </span>
+              {isSelf ? (
+                <span className="rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-bold text-indigo-600">
+                  You
+                </span>
+              ) : (
+                <button
+                  onClick={() => {
+                    if (
+                      confirm(
+                        `Revoke admin access for ${a.full_name || a.email}?`
+                      )
+                    )
+                      onRevoke(a.id);
+                  }}
+                  disabled={roleSavingId === a.id}
+                  className="rounded-full bg-red-50 px-2 py-0.5 text-xs font-bold text-red-600 transition hover:bg-red-100 disabled:opacity-60"
+                >
+                  {roleSavingId === a.id ? "…" : "Revoke"}
+                </button>
+              )}
+            </span>
+          );
+        })}
+      </div>
     </div>
   );
 }

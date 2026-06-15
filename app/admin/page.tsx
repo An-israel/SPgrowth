@@ -45,6 +45,7 @@ export default async function AdminPage() {
 
   return (
     <AdminClient
+      currentUserId={user.id}
       profiles={(profilesRes.data ?? []) as Profile[]}
       progress={(progressRes.data ?? []) as UserProgress[]}
       days={(contentRes.data ?? []) as DailyContent[]}

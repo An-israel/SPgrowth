@@ -1,11 +1,13 @@
 "use client";
 
+import { ShieldCheck, ShieldOff } from "lucide-react";
 import { TOTAL_DAYS, isProgressComplete } from "@/lib/program";
 import type {
   DailyContent,
   FinalGrowthPlan,
   Profile,
   UserProgress,
+  UserRole,
 } from "@/types/database";
 
 export interface UserRow {
@@ -19,12 +21,20 @@ export interface UserRow {
 export function UserDetail({
   row,
   days,
+  currentUserId,
+  roleSaving,
+  onSetRole,
   onClose,
 }: {
   row: UserRow;
   days: DailyContent[];
+  currentUserId: string;
+  roleSaving: boolean;
+  onSetRole: (userId: string, role: UserRole) => void;
   onClose: () => void;
 }) {
+  const isAdmin = row.profile.role === "admin";
+  const isSelf = row.profile.id === currentUserId;
   const progressByDay = new Map(row.progress.map((p) => [p.day_number, p]));
 
   function cellState(day: number): string {
@@ -61,6 +71,47 @@ export function UserDetail({
           >
             Close
           </button>
+        </div>
+
+        {/* Role management */}
+        <div className="mt-4 flex flex-wrap items-center gap-3 rounded-2xl border border-indigo-100 bg-indigo-50/50 p-3">
+          <span
+            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold ${
+              isAdmin
+                ? "bg-indigo-100 text-indigo-700"
+                : "bg-gray-100 text-muted"
+            }`}
+          >
+            <ShieldCheck className="h-3.5 w-3.5" />
+            {isAdmin ? "Admin" : "Student"}
+          </span>
+          {isSelf ? (
+            <span className="text-sm text-muted">This is you.</span>
+          ) : isAdmin ? (
+            <button
+              onClick={() => {
+                if (confirm(`Revoke admin access for ${row.profile.full_name || row.profile.email}?`))
+                  onSetRole(row.profile.id, "student");
+              }}
+              disabled={roleSaving}
+              className="inline-flex items-center gap-1.5 rounded-xl border-2 border-red-200 px-4 py-2 text-sm font-bold text-red-600 transition hover:bg-red-50 disabled:opacity-60"
+            >
+              <ShieldOff className="h-4 w-4" />
+              {roleSaving ? "Saving…" : "Revoke Admin"}
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                if (confirm(`Make ${row.profile.full_name || row.profile.email} an admin? They'll get full access to this dashboard.`))
+                  onSetRole(row.profile.id, "admin");
+              }}
+              disabled={roleSaving}
+              className="inline-flex items-center gap-1.5 rounded-xl gradient-gold-indigo px-4 py-2 text-sm font-bold text-white shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift disabled:opacity-60"
+            >
+              <ShieldCheck className="h-4 w-4" />
+              {roleSaving ? "Saving…" : "Promote to Admin"}
+            </button>
+          )}
         </div>
 
         <p className="mt-4 text-sm font-bold text-ink">
