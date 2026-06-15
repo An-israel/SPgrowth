@@ -62,6 +62,7 @@ In the Supabase dashboard, open the **SQL Editor** and run the files in
 3. `0003_seed.sql` — all 21 days of content
 4. `0004_add_pt.sql` — adds the Prophetic Takeoff (PT) daily-prayer field
 5. `0005_admin_manage_roles.sql` — lets admins update other users' roles
+6. `0006_add_location.sql` — adds branch/location to profiles
 
 Re-running `0003_seed.sql` is safe; it upserts content and preserves any
 admin-edited `resources`. All migrations are idempotent and safe to re-run.

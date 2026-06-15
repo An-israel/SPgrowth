@@ -10,6 +10,7 @@ export type Profile = {
   full_name: string;
   email: string;
   phone_number: string | null;
+  location: string | null;
   role: UserRole;
   created_at: string;
 };

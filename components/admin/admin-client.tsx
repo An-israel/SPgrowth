@@ -47,9 +47,12 @@ export function AdminClient({
   const [sortKey, setSortKey] = useState<SortKey>("name");
   const [detail, setDetail] = useState<UserRow | null>(null);
 
-  // Local copy of profiles so role changes reflect instantly.
+  const [locationFilter, setLocationFilter] = useState<string>("all");
+
+  // Local copy of profiles so role/location changes reflect instantly.
   const [profileList, setProfileList] = useState<Profile[]>(profiles);
   const [roleSavingId, setRoleSavingId] = useState<string | null>(null);
+  const [locationSavingId, setLocationSavingId] = useState<string | null>(null);
 
   async function setRole(userId: string, role: UserRole) {
     setRoleSavingId(userId);
@@ -67,6 +70,40 @@ export function AdminClient({
       alert(`Could not update role: ${error.message}`);
     }
   }
+
+  async function setLocation(userId: string, location: string) {
+    setLocationSavingId(userId);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ location })
+      .eq("id", userId);
+    setLocationSavingId(null);
+    if (!error) {
+      setProfileList((list) =>
+        list.map((p) => (p.id === userId ? { ...p, location } : p))
+      );
+      setDetail((d) =>
+        d && d.profile.id === userId
+          ? { ...d, profile: { ...d.profile, location } }
+          : d
+      );
+    } else {
+      alert(`Could not update location: ${error.message}`);
+    }
+  }
+
+  // Distinct locations among students, for the filter dropdown.
+  const locationOptions = useMemo(() => {
+    const set = new Set<string>();
+    let hasNone = false;
+    for (const p of profileList) {
+      if (p.role === "admin") continue;
+      const loc = p.location?.trim();
+      if (loc) set.add(loc);
+      else hasNone = true;
+    }
+    return { list: Array.from(set).sort(), hasNone };
+  }, [profileList]);
 
   const admins = useMemo(
     () => profileList.filter((p) => p.role === "admin"),
@@ -133,11 +170,20 @@ export function AdminClient({
     let result = rows.filter((r) => {
       const q = search.trim().toLowerCase();
       if (q) {
-        const hay = `${r.profile.full_name} ${r.profile.email}`.toLowerCase();
+        const hay =
+          `${r.profile.full_name} ${r.profile.email} ${r.profile.location ?? ""}`.toLowerCase();
         if (!hay.includes(q)) return false;
       }
       if (statusFilter === "on-track" && !isOnTrack(r)) return false;
       if (statusFilter === "falling-behind" && isOnTrack(r)) return false;
+      const loc = r.profile.location?.trim();
+      if (locationFilter === "__none__" && loc) return false;
+      if (
+        locationFilter !== "all" &&
+        locationFilter !== "__none__" &&
+        loc !== locationFilter
+      )
+        return false;
       return true;
     });
 
@@ -154,7 +200,7 @@ export function AdminClient({
     });
 
     return result;
-  }, [rows, search, statusFilter, sortKey, currentDay]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [rows, search, statusFilter, sortKey, locationFilter, currentDay]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="relative min-h-screen bg-canvas">
@@ -225,6 +271,9 @@ export function AdminClient({
                 setStatusFilter={setStatusFilter}
                 sortKey={sortKey}
                 setSortKey={setSortKey}
+                locationFilter={locationFilter}
+                setLocationFilter={setLocationFilter}
+                locationOptions={locationOptions}
                 isOnTrack={isOnTrack}
                 onSelect={setDetail}
               />
@@ -243,7 +292,9 @@ export function AdminClient({
           days={days}
           currentUserId={currentUserId}
           roleSaving={roleSavingId === detail.profile.id}
+          locationSaving={locationSavingId === detail.profile.id}
           onSetRole={setRole}
+          onSetLocation={setLocation}
           onClose={() => setDetail(null)}
         />
       )}
@@ -342,6 +393,9 @@ function UsersTab({
   setStatusFilter,
   sortKey,
   setSortKey,
+  locationFilter,
+  setLocationFilter,
+  locationOptions,
   isOnTrack,
   onSelect,
 }: {
@@ -352,21 +406,39 @@ function UsersTab({
   setStatusFilter: (v: StatusFilter) => void;
   sortKey: SortKey;
   setSortKey: (v: SortKey) => void;
+  locationFilter: string;
+  setLocationFilter: (v: string) => void;
+  locationOptions: { list: string[]; hasNone: boolean };
   isOnTrack: (r: UserRow) => boolean;
   onSelect: (r: UserRow) => void;
 }) {
   return (
     <div>
-      <div className="mb-3 flex flex-col gap-2 sm:flex-row">
-        <div className="relative flex-1">
+      <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+        <div className="relative min-w-[180px] flex-1">
           <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name or email…"
+            placeholder="Search by name, email or location…"
             className="w-full rounded-xl border border-gray-200 bg-white/80 py-2.5 pl-10 pr-4 text-sm outline-none transition focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20"
           />
         </div>
+        <select
+          value={locationFilter}
+          onChange={(e) => setLocationFilter(e.target.value)}
+          className="rounded-xl border border-gray-200 bg-white/80 px-3 py-2.5 text-sm font-medium outline-none transition focus:border-gold-400"
+        >
+          <option value="all">All locations</option>
+          {locationOptions.list.map((l) => (
+            <option key={l} value={l}>
+              {l}
+            </option>
+          ))}
+          {locationOptions.hasNone && (
+            <option value="__none__">No location set</option>
+          )}
+        </select>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
@@ -397,6 +469,7 @@ function UsersTab({
             <thead className="border-b border-gray-100 bg-white/40 text-xs uppercase tracking-wide text-muted">
               <tr>
                 <th className="px-4 py-3 font-bold">Name</th>
+                <th className="px-4 py-3 font-bold">Location</th>
                 <th className="hidden px-4 py-3 font-bold sm:table-cell">Contact</th>
                 <th className="px-4 py-3 font-bold">Progress</th>
                 <th className="hidden px-4 py-3 font-bold md:table-cell">Last Active</th>
@@ -412,6 +485,15 @@ function UsersTab({
                 >
                   <td className="px-4 py-3 font-semibold text-ink">
                     {r.profile.full_name || "Unnamed"}
+                  </td>
+                  <td className="px-4 py-3">
+                    {r.profile.location?.trim() ? (
+                      <span className="inline-block rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-bold text-indigo-700">
+                        {r.profile.location}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-muted/60">—</span>
+                    )}
                   </td>
                   <td className="hidden px-4 py-3 text-muted sm:table-cell">
                     <div className="flex items-center gap-1.5">

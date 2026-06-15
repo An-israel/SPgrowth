@@ -11,6 +11,7 @@ import {
   SubmitButton,
   friendlyAuthError,
 } from "@/components/auth-ui";
+import { LocationSelect } from "@/components/location-select";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -19,6 +20,7 @@ export default function SignUpPage() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [location, setLocation] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
@@ -28,6 +30,12 @@ export default function SignUpPage() {
     e.preventDefault();
     setError(null);
     setInfo(null);
+
+    if (!location.trim()) {
+      setError("Please select your location.");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -35,7 +43,11 @@ export default function SignUpPage() {
         email,
         password,
         options: {
-          data: { full_name: fullName, phone_number: phone },
+          data: {
+            full_name: fullName,
+            phone_number: phone,
+            location: location.trim(),
+          },
         },
       });
 
@@ -69,6 +81,10 @@ export default function SignUpPage() {
         <Field label="Full Name" type="text" value={fullName} onChange={setFullName} autoComplete="name" required />
         <Field label="Email" type="email" value={email} onChange={setEmail} autoComplete="email" required />
         <Field label="Phone Number" type="tel" value={phone} onChange={setPhone} autoComplete="tel" required />
+        <div>
+          <span className="mb-1.5 block text-sm font-semibold text-ink">Location</span>
+          <LocationSelect value={location} onChange={setLocation} />
+        </div>
         <Field label="Password" type="password" value={password} onChange={setPassword} autoComplete="new-password" minLength={6} required />
 
         {error && <FormMessage kind="error">{error}</FormMessage>}
