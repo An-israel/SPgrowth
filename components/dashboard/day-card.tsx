@@ -123,13 +123,18 @@ export function DayCard({
       {/* Prophetic Takeoff (PT) — daily church morning prayer */}
       <Section icon={Sunrise} title="Prophetic Takeoff (PT)" done={progress.pt_done}>
         <p className="text-muted">
-          Did you join PT today? Our morning prayer (Prophetic Takeoff) holds
-          daily from <span className="font-semibold text-ink">5:00–6:00am</span>.
+          Our morning prayer (Prophetic Takeoff) holds daily from{" "}
+          <span className="font-semibold text-ink">5:00–6:00am</span>.
+        </p>
+        <p className="rounded-xl border border-indigo-100 bg-indigo-50/60 p-3 text-sm text-muted">
+          💡 If you haven&apos;t joined yet, search{" "}
+          <span className="font-semibold text-ink">&ldquo;Prophetic Takeoff&rdquo;</span>{" "}
+          on YouTube and pray along — then come back and click{" "}
+          <span className="font-semibold text-ink">Done</span>.
         </p>
         <TaskButton
           done={progress.pt_done}
-          label="Yes, I joined PT"
-          doneLabel="Joined PT — tap to undo"
+          label="Mark PT Done"
           onClick={() => onToggle("pt_done")}
         />
       </Section>
