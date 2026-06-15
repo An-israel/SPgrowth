@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProgramDay } from "@/lib/program";
 import { DashboardClient } from "@/components/dashboard/dashboard-client";
+import { LocationGate } from "@/components/location-gate";
 import type { DailyContent, UserProgress } from "@/types/database";
 
 export const dynamic = "force-dynamic";
@@ -31,13 +32,19 @@ export default async function DashboardPage() {
   const currentDay = getCurrentProgramDay(startDate);
 
   return (
-    <DashboardClient
-      userId={user.id}
-      fullName={profileRes.data?.full_name || "Friend"}
-      isAdmin={profileRes.data?.role === "admin"}
-      days={days}
-      initialProgress={progress}
-      currentDay={currentDay}
-    />
+    <>
+      <LocationGate
+        userId={user.id}
+        initialLocation={profileRes.data?.location ?? null}
+      />
+      <DashboardClient
+        userId={user.id}
+        fullName={profileRes.data?.full_name || "Friend"}
+        isAdmin={profileRes.data?.role === "admin"}
+        days={days}
+        initialProgress={progress}
+        currentDay={currentDay}
+      />
+    </>
   );
 }

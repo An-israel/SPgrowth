@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProgramDay } from "@/lib/program";
 import { AdminClient } from "@/components/admin/admin-client";
+import { LocationGate } from "@/components/location-gate";
 import type {
   DailyContent,
   FinalGrowthPlan,
@@ -22,7 +23,7 @@ export default async function AdminPage() {
   // Middleware already guards this route, but double-check the role here.
   const { data: me } = await supabase
     .from("profiles")
-    .select("role")
+    .select("role, location")
     .eq("id", user.id)
     .single();
   if (me?.role !== "admin") redirect("/dashboard");
@@ -44,14 +45,17 @@ export default async function AdminPage() {
     configRes.data?.program_start_date ?? new Date().toISOString();
 
   return (
-    <AdminClient
-      currentUserId={user.id}
-      profiles={(profilesRes.data ?? []) as Profile[]}
-      progress={(progressRes.data ?? []) as UserProgress[]}
-      days={(contentRes.data ?? []) as DailyContent[]}
-      plans={(plansRes.data ?? []) as FinalGrowthPlan[]}
-      programStartDate={startDate}
-      currentDay={getCurrentProgramDay(startDate)}
-    />
+    <>
+      <LocationGate userId={user.id} initialLocation={me?.location ?? null} />
+      <AdminClient
+        currentUserId={user.id}
+        profiles={(profilesRes.data ?? []) as Profile[]}
+        progress={(progressRes.data ?? []) as UserProgress[]}
+        days={(contentRes.data ?? []) as DailyContent[]}
+        plans={(plansRes.data ?? []) as FinalGrowthPlan[]}
+        programStartDate={startDate}
+        currentDay={getCurrentProgramDay(startDate)}
+      />
+    </>
   );
 }

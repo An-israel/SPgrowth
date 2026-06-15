@@ -1,7 +1,9 @@
 "use client";
 
-import { ShieldCheck, ShieldOff } from "lucide-react";
+import { useState } from "react";
+import { ShieldCheck, ShieldOff, MapPin } from "lucide-react";
 import { TOTAL_DAYS, isProgressComplete } from "@/lib/program";
+import { LocationSelect } from "@/components/location-select";
 import type {
   DailyContent,
   FinalGrowthPlan,
@@ -23,18 +25,25 @@ export function UserDetail({
   days,
   currentUserId,
   roleSaving,
+  locationSaving,
   onSetRole,
+  onSetLocation,
   onClose,
 }: {
   row: UserRow;
   days: DailyContent[];
   currentUserId: string;
   roleSaving: boolean;
+  locationSaving: boolean;
   onSetRole: (userId: string, role: UserRole) => void;
+  onSetLocation: (userId: string, location: string) => void;
   onClose: () => void;
 }) {
   const isAdmin = row.profile.role === "admin";
   const isSelf = row.profile.id === currentUserId;
+
+  const [editingLocation, setEditingLocation] = useState(false);
+  const [locationDraft, setLocationDraft] = useState(row.profile.location ?? "");
   const progressByDay = new Map(row.progress.map((p) => [p.day_number, p]));
 
   function cellState(day: number): string {
@@ -111,6 +120,55 @@ export function UserDetail({
               <ShieldCheck className="h-4 w-4" />
               {roleSaving ? "Saving…" : "Promote to Admin"}
             </button>
+          )}
+        </div>
+
+        {/* Location */}
+        <div className="mt-3 rounded-2xl border border-gray-100 bg-white/50 p-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-ink">
+              <MapPin className="h-4 w-4 text-indigo-600" />
+              Location:
+            </span>
+            <span className="text-sm font-bold text-indigo-700">
+              {row.profile.location?.trim() || "Not set"}
+            </span>
+            {!editingLocation && (
+              <button
+                onClick={() => {
+                  setLocationDraft(row.profile.location ?? "");
+                  setEditingLocation(true);
+                }}
+                className="ml-auto rounded-lg border border-gray-200 px-2.5 py-1 text-xs font-semibold text-muted transition hover:border-indigo-200 hover:text-indigo-700"
+              >
+                Edit
+              </button>
+            )}
+          </div>
+          {editingLocation && (
+            <div className="mt-3 space-y-2">
+              <LocationSelect value={locationDraft} onChange={setLocationDraft} />
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    if (locationDraft.trim()) {
+                      onSetLocation(row.profile.id, locationDraft.trim());
+                      setEditingLocation(false);
+                    }
+                  }}
+                  disabled={locationSaving || !locationDraft.trim()}
+                  className="rounded-xl gradient-gold-indigo px-4 py-2 text-sm font-bold text-white shadow-soft transition hover:-translate-y-0.5 disabled:opacity-60"
+                >
+                  {locationSaving ? "Saving…" : "Save"}
+                </button>
+                <button
+                  onClick={() => setEditingLocation(false)}
+                  className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-muted transition hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           )}
         </div>
 
